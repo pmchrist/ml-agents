@@ -65,15 +65,8 @@ in python, run:
 
 ```python
 from mlagents_envs.environment import UnityEnvironment
-# This is a non-blocking call that only loads the environment.
 env = UnityEnvironment(file_name="3DBall", seed=1, side_channels=[])
-# Start interacting with the evironment.
-env.reset()
-behavior_names = env.behavior_spec.keys()
-...
 ```
-**NOTE:** Please read [Interacting with a Unity Environment](#interacting-with-a-unity-environment)
-to read more about how you can interact with the Unity environment from Python.
 
 - `file_name` is the name of the environment binary (located in the root
   directory of the python project).
@@ -109,13 +102,14 @@ A `BaseEnv` has the following methods:
   act.
 - **Close : `env.close()`** Sends a shutdown signal to the environment and
   terminates the communication.
-- **Behavior Specs : `env.behavior_specs`** Returns a Mapping of
-  `BehaviorName` to `BehaviorSpec` objects (read only).
-  A `BehaviorSpec` contains information such as the observation shapes, the
-  action type (multi-discrete or continuous) and the action shape. Note that
-  the `BehaviorSpec` for a specific group is fixed throughout the simulation.
-  The number of entries in the Mapping can change over time in the simulation
-  if new Agent behaviors are created in the simulation.
+- **Get Behavior Names : `env.get_behavior_names()`** Returns a list of
+  `BehaviorName`. Note that the number of groups can change over time in the
+  simulation if new Agent behaviors are created in the simulation.
+- **Get Behavior Spec : `env.get_behavior_spec(behavior_name: str)`** Returns
+  the `BehaviorSpec` corresponding to the behavior_name given as input. A
+  `BehaviorSpec` contains information such as the observation shapes, the action
+  type (multi-discrete or continuous) and the action shape. Note that the
+  `BehaviorSpec` for a specific group is fixed throughout the simulation.
 - **Get Steps : `env.get_steps(behavior_name: str)`** Returns a tuple
   `DecisionSteps, TerminalSteps` corresponding to the behavior_name given as
   input. The `DecisionSteps` contains information about the state of the agents
@@ -206,9 +200,9 @@ A `TerminalSteps` has the following fields :
 - `agent_id` is an int vector of length batch size containing unique identifier
   for the corresponding Agent. This is used to track Agents across simulation
   steps.
- - `interrupted` is an array of booleans of length batch size. Is true if the
- associated Agent was interrupted since the last decision step. For example,
- if the Agent reached the maximum number of steps for the episode.
+- `max_step` is an array of booleans of length batch size. Is true if the
+  associated Agent reached its maximum number of steps during the last
+  simulation step.
 
 It also has the two following methods:
 
@@ -224,9 +218,8 @@ A `TerminalStep` has the following fields:
 - `reward` is a float. Corresponds to the rewards collected by the agent since
   the last simulation step.
 - `agent_id` is an int and an unique identifier for the corresponding Agent.
- - `interrupted` is a bool. Is true if the Agent was interrupted since the last
- decision step. For example, if the Agent reached the maximum number of steps for
- the episode.
+- `max_step` is a bool. Is true if the Agent reached its maximum number of steps
+  during the last simulation step.
 
 #### BehaviorSpec
 
